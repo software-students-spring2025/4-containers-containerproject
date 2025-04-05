@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  machine-learning-client:
+    build: ./machine-learning-client
+    container_name: ml-client
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+    volumes:
+      - ./machine-learning-client:/app
+
+  web-app:
+    build: ./web-app
+    container_name: flask-web-app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017
+    volumes:
+      - ./web-app:/app
+
+volumes:
+  mongo-data:
