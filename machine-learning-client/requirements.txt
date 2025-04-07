@@ -1,1 +1,2 @@
-//Put only the dependency names in this file, nothing else
+opencv-python-headless
+pymongo==4.5.0
