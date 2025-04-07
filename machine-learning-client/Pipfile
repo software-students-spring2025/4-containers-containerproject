@@ -4,8 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pylint = "*"
-black = "*"
 opencv-python-headless = "*"
 
 [dev-packages]
