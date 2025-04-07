@@ -1,21 +1,25 @@
+"""
+Init file.
+"""
+
+import os
 from flask import Flask
 from flask_pymongo import PyMongo
 from dotenv import load_dotenv
-import os
 
-#load environment variables
+# load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
-#configure MongoDB settings
+# configure MongoDB settings
 # app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
 # app.config["SECRET_KEY"] = os.urandom(24)
 
 # mongo = PyMongo(app)
 
-# #test the mongodb connection 
+# #test the mongodb connection
 # try:
 #     mongo.cx.server_info()
 #     print("MongoDB connected successfully")
@@ -25,5 +29,3 @@ app = Flask(__name__)
 
 # #importing routes after app is created to avoid circular imports
 # from app import routes
-
-
