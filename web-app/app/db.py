@@ -10,7 +10,7 @@ def some_function():
     """
     Function that performs some task.
     """
-    pass
+    # TODO: Implement this function
 
 
 def init_db(app):
