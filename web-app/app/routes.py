@@ -8,13 +8,6 @@ from .db import get_collection
 main = Blueprint("main", __name__)
 
 
-def some_function():
-    """
-    Function that performs some task.
-    """
-    # TODO: Implement this function
-
-
 @main.route("/")
 def index():
     collection = get_collection()

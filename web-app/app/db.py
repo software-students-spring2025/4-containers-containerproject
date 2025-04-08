@@ -6,13 +6,6 @@ from flask import g  # , current_app
 from pymongo import MongoClient
 
 
-def some_function():
-    """
-    Function that performs some task.
-    """
-    # TODO: Implement this function
-
-
 def init_db(app):
     @app.before_request
     def connect_db():

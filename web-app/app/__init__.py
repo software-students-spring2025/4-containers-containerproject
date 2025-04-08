@@ -2,16 +2,9 @@
 app initialization
 """
 
-from .routes import main
 from flask import Flask
+from .routes import main
 from .db import init_db
-
-
-def some_function():
-    """
-    Function that performs some task.
-    """
-    # TODO: Implement this function
 
 
 def create_app():
