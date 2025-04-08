@@ -1,7 +1,17 @@
+"""
+webpage routes
+"""
+
 from flask import Blueprint, render_template
 from .db import get_collection
 
 main = Blueprint("main", __name__)
+
+def some_function():
+    """
+    Function that performs some task.
+    """
+    pass
 
 @main.route("/")
 def index():

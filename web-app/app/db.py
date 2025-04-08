@@ -1,5 +1,15 @@
-from flask import current_app, g
+"""
+database link
+"""
+
+from flask import g#, current_app
 from pymongo import MongoClient
+
+def some_function():
+    """
+    Function that performs some task.
+    """
+    pass
 
 def init_db(app):
     @app.before_request
@@ -10,7 +20,7 @@ def init_db(app):
             g.db = g.client["ml_data"]
 
     @app.teardown_appcontext
-    def close_db(error):
+    def close_db(_error):
         client = g.pop("client", None)
         if client is not None:
             client.close()
