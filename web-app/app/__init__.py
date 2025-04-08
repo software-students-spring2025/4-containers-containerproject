@@ -6,11 +6,13 @@ from .routes import main
 from flask import Flask
 from .db import init_db
 
+
 def some_function():
     """
     Function that performs some task.
     """
     pass
+
 
 def create_app():
     app = Flask(__name__)
