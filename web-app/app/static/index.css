@@ -1,0 +1,34 @@
+/* container */
+.content-with-sidebars {
+    display:flex;
+    flex-wrap:wrap;
+}
+
+/* columns */
+.content-with-sidebars > * {
+    width:100%;
+    padding:1rem;
+}
+
+/* tablet breakpoint */
+@media (min-width:768px) {
+    .content-with-sidebars > * {
+        width:50%;
+    }
+    .content-with-sidebars > *:nth-child(1) {
+        width:100%;
+    }
+}
+
+/* desktop breakpoint */
+@media (min-width:1024px) {
+    .content-with-sidebars > * {
+        width:25%;
+    }
+    .content-with-sidebars > *:nth-child(1) {
+        width:50%;
+    }
+    .content-with-sidebars > *:nth-child(2) {
+        order:-1;
+    }
+}
