@@ -10,6 +10,7 @@ def init_db(app):
     """
     init db function
     """
+
     @app.before_request
     def connect_db():
         if "db" not in g:
