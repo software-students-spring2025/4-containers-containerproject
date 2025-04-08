@@ -7,6 +7,9 @@ from pymongo import MongoClient
 
 
 def init_db(app):
+    """
+    init db function
+    """
     @app.before_request
     def connect_db():
         if "db" not in g:
@@ -22,4 +25,7 @@ def init_db(app):
 
 
 def get_collection():
+    """
+    get collection function
+    """
     return g.db["results"]

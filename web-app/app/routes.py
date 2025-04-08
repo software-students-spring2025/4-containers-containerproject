@@ -10,6 +10,9 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
+    """
+    main route
+    """
     collection = get_collection()
     results = list(collection.find().sort("_id", -1).limit(10))
     return render_template("index.html", results=results)

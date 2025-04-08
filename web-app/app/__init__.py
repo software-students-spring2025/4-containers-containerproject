@@ -8,6 +8,10 @@ from .db import init_db
 
 
 def create_app():
+    """
+    create app
+    """
+    
     app = Flask(__name__)
     app.config.from_prefixed_env()
     init_db(app)
