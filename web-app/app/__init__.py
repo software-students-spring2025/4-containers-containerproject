@@ -1,31 +1,20 @@
 """
-Init file.
+app initialization
 """
 
-import os
 from flask import Flask
-from flask_pymongo import PyMongo
-from dotenv import load_dotenv
+from .routes import main
+from .db import init_db
 
-# load environment variables
-load_dotenv()
 
-app = Flask(__name__)
+def create_app():
+    """
+    create app
+    """
+    app = Flask(__name__)
+    app.config.from_prefixed_env()
+    init_db(app)
 
-# configure MongoDB settings
-# app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+    app.register_blueprint(main)
 
-# app.config["SECRET_KEY"] = os.urandom(24)
-
-# mongo = PyMongo(app)
-
-# #test the mongodb connection
-# try:
-#     mongo.cx.server_info()
-#     print("MongoDB connected successfully")
-# except Exception as e:
-#     print(f"Error connecting to MongoDB: {e}")
-#     raise e
-
-# #importing routes after app is created to avoid circular imports
-# from app import routes
+    return app
