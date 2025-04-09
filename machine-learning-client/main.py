@@ -10,7 +10,7 @@ class JumpingJackCounter:
             min_detection_confidence=0.5, min_tracking_confidence=0.5
         )
         self.count = 0
-        self.state = "down" # Initial state
+        self.state = "down"  # Initial state
         self.last_state_change = time.time()
         self.cooldown = 1.0  # Cooldown period in seconds
 
