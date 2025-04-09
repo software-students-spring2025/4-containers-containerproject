@@ -1,36 +1,36 @@
 services:
-
   mongodb:
     image: mongo:latest
     container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongodb_data:/data/db
 
   machine-learning-client:
     build: ./machine-learning-client
     container_name: ml-client
-    depends_on:
-      - mongodb
-    environment:
-      - MONGODB_URI=mongodb://mongodb:27017
+    env_file:
+      - .env
     volumes:
       - ./machine-learning-client:/app
+    depends_on:
+      - mongodb
 
   web-app:
     build: ./web-app
-    container_name: flask-web-app
+    container_name: web-app
     ports:
-      - "5001:5000"
-    depends_on:
-      - mongodb
+      - "5001:5001"
+    env_file:
+      - .env
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
-      - MONGODB_URI=mongodb://mongodb:27017
     volumes:
       - ./web-app:/app
+    depends_on:
+      - mongodb
 
 volumes:
-  mongo-data:
+  mongodb_data:

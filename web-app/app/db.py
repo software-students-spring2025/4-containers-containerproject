@@ -4,6 +4,7 @@ database link
 
 from flask import g  # , current_app
 from pymongo import MongoClient
+import os
 
 
 def init_db(app):
@@ -14,9 +15,9 @@ def init_db(app):
     @app.before_request
     def connect_db():
         if "db" not in g:
-            mongo_uri = app.config.get("MONGO_URI")
+            mongo_uri = os.environ.get("MONGODB_URI")
             g.client = MongoClient(mongo_uri)
-            g.db = g.client["ml_data"]
+            g.db = g.client["jumping-jack-db"]
 
     @app.teardown_appcontext
     def close_db(_error):
@@ -29,4 +30,4 @@ def get_collection():
     """
     get collection function
     """
-    return g.db["results"]
+    return g.db["user"]

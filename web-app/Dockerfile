@@ -18,7 +18,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FLASK_APP=app.py \
-    FLASK_RUN_PORT=3000 \
+    FLASK_RUN_PORT=5001 \
     FLASK_RUN_HOST=0.0.0.0
 
 WORKDIR /app
@@ -28,6 +28,6 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 5001
 
 CMD ["flask", "run"]
