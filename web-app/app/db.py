@@ -2,9 +2,9 @@
 database link
 """
 
+import os
 from flask import g  # , current_app
 from pymongo import MongoClient
-import os
 
 
 def init_db(app):
