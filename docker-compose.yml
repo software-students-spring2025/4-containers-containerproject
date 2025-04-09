@@ -6,6 +6,8 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+      - ./jumping-jack-db:/data/restore
+      - ./scripts/init-restore.sh:/docker-entrypoint-initdb.d/init-restore.sh
 
   machine-learning-client:
     build: ./machine-learning-client
