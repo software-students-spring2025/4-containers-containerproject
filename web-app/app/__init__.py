@@ -11,6 +11,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config["MONGODB_URI"] = os.getenv("MONGODB_URI")
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
 mongo = PyMongo(app)
+
+from app import routes

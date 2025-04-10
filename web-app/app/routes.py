@@ -2,13 +2,11 @@
 webpage routes
 """
 
-from flask import Blueprint, render_template, request, session, redirect, url_for, flash
+from flask import render_template, request, session, redirect, url_for, flash
 from app import mongo
+from . import app
 
-main = Blueprint("main", __name__)
-
-
-@main.route("/")
+@app.route("/")
 def index():
     """
     main route
@@ -21,7 +19,7 @@ def index():
         return render_template("index.html", recent_items=[])
 
 
-@main.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     """
     register
@@ -46,7 +44,7 @@ def register():
     return render_template("register.html")
 
 
-@main.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """
     login
