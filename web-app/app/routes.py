@@ -21,6 +21,7 @@ def index():
         print(f"Error fetching data: {e}")
         return render_template("index.html", recent_items=[])
 
+
 @main.route("/register", methods=["GET", "POST"])
 def register():
     """
@@ -31,22 +32,20 @@ def register():
         password = request.form["password"]
         weight = request.form["weight"]
 
-        #check if the username is already in use
+        # check if the username is already in use
         existing_user = mongo.db.user.find_one({"username": username})
         if existing_user:
             flash("Username is already in use. Please choose another username.")
 
-        #if the user does not exist, add the new user
-        mongo.db.user.insert_one({
-            "username": username,
-            "password": password, 
-            "weight": weight
-        })
-        
+        # if the user does not exist, add the new user
+        mongo.db.user.insert_one(
+            {"username": username, "password": password, "weight": weight}
+        )
         flash("Account created successfully! Please log in.")
         return redirect(url_for("login"))
 
     return render_template("register.html")
+
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -54,17 +53,16 @@ def login():
     login
     """
     if request.method == "POST":
-        username = request.form["username"]  #get username from form
-        password = request.form["password"]  #get password from form
+        username = request.form["username"]  # get username from form
+        password = request.form["password"]  # get password from form
 
-        #look for the user in the MongoDB 'user' collection
+        # look for the user in the MongoDB 'user' collection
         user = mongo.db.user.find_one({"username": username})
 
-        if user and user["password"] == password:  
-            session["user_id"] = str(user["_id"])  #user session
-            return redirect(url_for("home"))  #direct to home page
-        
+        if user and user["password"] == password:
+            session["user_id"] = str(user["_id"])  # user session
+            return redirect(url_for("home"))  # direct to home page
         else:
             flash("Invalid username or password. Please try again.")
 
-    return render_template("login.html")  #render login page
+    return render_template("login.html")  # render login page
