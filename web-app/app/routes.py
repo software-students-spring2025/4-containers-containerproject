@@ -54,12 +54,12 @@ def register():
         # if the user does not exist, add the new user
         mongo.db.users.insert_one(
             {
-            "username": username,
-            "password": password,
-            "jump_count": 0,
-            "calories_burned": 0,
-            "weight": weight,
-            "seconds_jumped": 0
+                "username": username,
+                "password": password,
+                "jump_count": 0,
+                "calories_burned": 0,
+                "weight": weight,
+                "seconds_jumped": 0,
             }
         )
         flash("Account created successfully! Please log in.")
@@ -67,10 +67,10 @@ def register():
 
     return render_template("register.html")
 
+
 @app.route("/home")
 def home():
     """
     home (main page)
     """
     return render_template("home.html")
-
