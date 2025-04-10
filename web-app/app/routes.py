@@ -3,11 +3,9 @@ webpage routes
 """
 
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
-from .db import get_collection
-from app import app, mongo
+from app import mongo
 
 main = Blueprint("main", __name__)
-
 
 @main.route("/")
 def index():
@@ -62,7 +60,6 @@ def login():
         if user and user["password"] == password:
             session["user_id"] = str(user["_id"])  # user session
             return redirect(url_for("home"))  # direct to home page
-        else:
-            flash("Invalid username or password. Please try again.")
+        flash("Invalid username or password. Please try again.")
 
     return render_template("login.html")  # render login page
