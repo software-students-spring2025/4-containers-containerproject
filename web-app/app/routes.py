@@ -2,8 +2,10 @@
 webpage routes
 """
 
+import time
 from flask import render_template, request, session, redirect, url_for, flash
 from app import mongo
+from bson.objectid import ObjectId
 from . import app  # pylint: disable=cyclic-import
 
 
@@ -68,9 +70,70 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/home")
+@app.route("/logout")
+def logout():
+    """
+    session logout
+    """
+    session.clear()
+    flash("Thanks for jumping with Jumparoo!")
+    return redirect(url_for("login"))
+
+
+@app.route("/home", methods=["GET", "POST"])
 def home():
     """
-    home (main page)
+    central page
     """
-    return render_template("home.html")
+    if "session_active" not in session:
+        session["session_active"] = False
+
+    user = None
+    if "user_id" in session:
+        user = mongo.db.users.find_one({"_id": ObjectId(session["user_id"])})
+
+    calories_burned = 0
+
+    if request.method == "POST":
+
+        if not session["session_active"]:
+            session["session_active"] = True
+            session["start_time"] = time.time()
+
+        else:
+            session["session_active"] = False
+            end_time = time.time()
+            session_length = int(end_time - session.get("start_time", end_time))
+
+            if user:
+                weight = float(user.get("weight", 0))
+                added_calories = (session_length * 12 * weight) / (60 * 150)
+
+                mongo.db.users.update_one(
+                    {"_id": ObjectId(session["user_id"])},
+                    {
+                        "$inc": {
+                            "seconds_jumped": session_length,
+                            "calories_burned": round(added_calories, 2),
+                        }
+                    },
+                )
+
+                user = mongo.db.users.find_one({"_id": ObjectId(session["user_id"])})
+                calories_burned = round(added_calories, 2)
+
+            session.pop("start_time", None)
+
+    leaderboard = list(
+        mongo.db.users.find({}, {"username": 1, "jump_count": 1, "_id": 0})
+        .sort("jump_count", -1)
+        .limit(5)
+    )
+
+    return render_template(
+        "home.html",
+        session_active=session["session_active"],
+        user=user,
+        leaderboard=leaderboard,
+        calories_burned=calories_burned,
+    )

@@ -3,26 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #f5f5f5;
-      font-family: Arial, sans-serif;
-    }
-
-    h1 {
-      font-size: 6rem;
-      color: #333;
-    }
-  </style>
+  <title>Jumparoo | Home</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 </head>
 <body>
-  <h1>HOME</h1>
+  <div class="session-container">
+
+    <!-- left stats -->
+    <div class="left-panel">
+      {% if session_active %}
+        <div class="stat">
+          <p class="label">Current Jump Count</p>
+          <p class="value">10</p>
+        </div>
+      {% else %}
+        <div class="stat">
+          <p class="label">Total Jump Count</p>
+          <p class="value">{{ user.jump_count if user else 0 }}</p>
+        </div>
+        <div class="stat">
+          <p class="label">Total Jump Time (sec)</p>
+          <p class="value">{{ user.seconds_jumped if user else 0 }}</p>
+        </div>
+        <div class="stat">
+          <p class="label">Total Calories Burned</p>
+          <p class="value">{{ user.calories_burned | round(2) }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- webcam input -->
+    <div class="webcam-wrapper">
+      <div class="webcam-placeholder">
+        webcam input
+      </div>
+      <form method="POST" class="controls">
+        <button type="submit">
+          {% if session_active %}
+            End Session
+          {% else %}
+            Start Session
+          {% endif %}
+        </button>
+      </form>
+    </div>
+
+    <!-- right stats -->
+    <div class="right-panel">
+      {% if not session_active %}
+        <form action="{{ url_for('logout') }}" method="get" class="logout-form">
+          <button type="submit" class="logout-btn">Log Out</button>
+        </form>
+        <h3>Leaderboard</h3>
+        <table class="leaderboard">
+          <tr>
+            <th>Username</th>
+            <th>Total Jumps</th>
+          </tr>
+          {% for entry in leaderboard %}
+          <tr>
+            <td>{{ entry.username }}</td>
+            <td>{{ entry.jump_count }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+
+  </div>
 </body>
 </html>
