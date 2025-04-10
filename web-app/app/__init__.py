@@ -2,19 +2,15 @@
 app initialization
 """
 
+import os
 from flask import Flask
-from .routes import main
-from .db import init_db
+from flask_pymongo import PyMongo
+from dotenv import load_dotenv
 
+load_dotenv()
 
-def create_app():
-    """
-    create app
-    """
-    app = Flask(__name__)
-    app.config.from_prefixed_env()
-    init_db(app)
+app = Flask(__name__)
 
-    app.register_blueprint(main)
+app.config["MONGODB_URI"] = os.getenv("MONGODB_URI")
 
-    return app
+mongo = PyMongo(app)
