@@ -15,7 +15,7 @@ def index():
     try:
         return render_template("index.html")
 
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-exception-caught
         print(f"Error fetching data: {e}")
         return render_template("index.html", recent_items=[])
 
