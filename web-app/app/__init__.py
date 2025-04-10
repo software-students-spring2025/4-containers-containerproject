@@ -15,4 +15,4 @@ app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
 mongo = PyMongo(app)
 
-from app import routes
+from app import routes # pylint: disable=wrong-import-position
