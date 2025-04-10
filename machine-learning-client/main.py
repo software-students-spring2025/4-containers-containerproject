@@ -15,30 +15,32 @@ from mediapipe.python.solutions import drawing_utils as mp_drawing
 
 # Configure logging
 logging.basicConfig(
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    level=logging.INFO
+    format="%(asctime)s [%(levelname)s] %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
 
-class JumpingJackCounter:
+class JumpingJackDetector:
     """
-    A class that tracks and counts jumping jack exercises using pose detection.
+    A class that detects jumping jack exercises using pose detection.
     """
 
     def __init__(self):
         self.pose = mp_pose.Pose(
             min_detection_confidence=0.8, min_tracking_confidence=0.8
         )
-        self.count = 0
         self.state = "down"
         self.last_state_change = time.time()
         self.cooldown = 0.5
+        self.jump_detected = False
 
     def process_frame(self, frame):
         """
         Processes a single frame.
         """
+        # Reset jump detection for this frame
+        self.jump_detected = False
+
         # Convert the BGR image to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -76,52 +78,28 @@ class JumpingJackCounter:
                     logger.info("Position: UP")
                 elif self.state == "up" and wrist_y > shoulder_y:
                     self.state = "down"
-                    self.count += 1
+                    self.jump_detected = True  # Flag that a jump was completed
                     self.last_state_change = current_time
-                    logger.info("Position: DOWN, Count: %s", self.count)
-
-            # Display count
-            cv2.putText(
-                annotated_frame,
-                f"Count: {self.count}",
-                (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (0, 255, 0),
-                2,
-            )
-
-            # Add position text
-            cv2.putText(
-                annotated_frame,
-                f"Position: {self.state.upper()}",
-                (10, 70),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (255, 0, 0),
-                2,
-            )
+                    logger.info("Position: DOWN, Jump detected!")
 
         # Return both the processed frame and the results
         return {
             "annotated_frame": annotated_frame,
-            "count": self.count,
-            "state": self.state
+            "jump_detected": self.jump_detected,
+            "state": self.state,
         }
 
 
-# Global counter instance to maintain state between frames
-counter = JumpingJackCounter()
+# Global detector instance
+detector = JumpingJackDetector()
 
 
-# Process a frame with the jumping jack counter
 def process_frame_with_ml(frame):
     """
-    Process a frame with the JumpingJackCounter.
+    Process a frame with the JumpingJackDetector.
     """
-
-    # Process the frame with the counter
-    result = counter.process_frame(frame)
+    # Process the frame with the detector
+    result = detector.process_frame(frame)
 
     # Encode the annotated frame as .jpg
     _, buffer = cv2.imencode(".jpg", result["annotated_frame"])
@@ -130,15 +108,10 @@ def process_frame_with_ml(frame):
     # Return results including the annotated frame
     return {
         "type": "ml_result",
-        "data": {
-            "count": result["count"],
-            "state": result["state"],
-            "message": f"Jumping Jack Count: {result['count']}"
-        },
+        "data": {"jump_detected": result["jump_detected"], "state": result["state"]},
         "image": f"data:image/jpeg;base64,{img_str}",
-        "timestamp": None  # Will be filled in by the calling function
+        "timestamp": None,  # Will be filled in by the calling function
     }
-
 
 
 # WebSocket connection handler
@@ -149,7 +122,6 @@ async def handle_connection(websocket):
     client_id = id(websocket)
     logger.info("Client %s connected from %s", client_id, websocket.remote_address)
 
-
     async for message in websocket:
         # Parse the message
         data = json.loads(message)
@@ -157,7 +129,9 @@ async def handle_connection(websocket):
 
         if data["type"] == "frame":
             # Convert base64 image to OpenCV format
-            img_data = data["data"].split(',')[1]  # Remove data:image/jpeg;base64, prefix
+            img_data = data["data"].split(",")[
+                1
+            ]  # Remove data:image/jpeg;base64, prefix
             img_bytes = base64.b64decode(img_data)
 
             # Convert to numpy array
@@ -171,8 +145,9 @@ async def handle_connection(websocket):
             # Send back the results
             await websocket.send(json.dumps(result))
 
-            logger.debug("Processed frame from client %s, timestamp: %s", client_id, timestamp)
-
+            logger.debug(
+                "Processed frame from client %s, timestamp: %s", client_id, timestamp
+            )
 
 
 async def start_server():
@@ -201,7 +176,7 @@ def main():
     """
     Main Function.
     """
-    logger.info("Jumping Jack Counter ML Client is starting...")
+    logger.info("Jumping Jack Detector ML Client is starting...")
 
     # Start the WebSocket server
     asyncio.run(start_server())

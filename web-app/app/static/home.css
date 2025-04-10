@@ -112,3 +112,26 @@ button[type="submit"] {
 .leaderboard th {
   text-decoration: underline;
 }
+
+#connection-info {
+  margin-top: 10px;
+  font-size: 0.8em;
+}
+#fps-display {
+  margin-top: 5px;
+  font-size: 0.8em;
+}
+
+#status {
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 4px;
+}
+.success {
+  background-color: #dff0d8;
+  color: #3c763d;
+}
+.error {
+  background-color: #f2dede;
+  color: #a94442;
+}
