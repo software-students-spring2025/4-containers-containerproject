@@ -1,34 +1,56 @@
-/* container */
-.content-with-sidebars {
-    display:flex;
-    flex-wrap:wrap;
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* columns */
-.content-with-sidebars > * {
-    width:100%;
-    padding:1rem;
+body {
+    font-family: Arial, sans-serif;
 }
 
-/* tablet breakpoint */
-@media (min-width:768px) {
-    .content-with-sidebars > * {
-        width:50%;
-    }
-    .content-with-sidebars > *:nth-child(1) {
-        width:100%;
-    }
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f1f1f1;
+    padding: 20px;
+    border-bottom: 2px solid #ccc;
 }
 
-/* desktop breakpoint */
-@media (min-width:1024px) {
-    .content-with-sidebars > * {
-        width:25%;
-    }
-    .content-with-sidebars > *:nth-child(1) {
-        width:50%;
-    }
-    .content-with-sidebars > *:nth-child(2) {
-        order:-1;
-    }
+.header h1 {
+    font-size: 2em;
+}
+
+.login-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/* Main Content Styles */
+.main-content {
+    display: flex; /* Ensures child elements are laid out horizontally */
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.main-content > div {
+    border: 1px solid #ccc;
+    padding: 20px;
+    width: 30%; /* Ensures each block takes up 30% of the width */
+}
+
+.left-block, .middle-block, .right-block {
+    background-color: #fafafa;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 1em;
 }
