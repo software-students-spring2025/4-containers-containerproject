@@ -4,7 +4,8 @@ webpage routes
 
 from flask import render_template, request, session, redirect, url_for, flash
 from app import mongo
-from . import app # pylint: disable=cyclic-import
+from . import app  # pylint: disable=cyclic-import
+
 
 @app.route("/")
 def index():
