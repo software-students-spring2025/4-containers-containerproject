@@ -1,6 +1,6 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
-![Machine Learning Client CI]()
-![Web App CI]()
+![Python Workflow - Machine Learing Client](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/ml-client.yml/badge.svg)
+![Python Workflow - Web App](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/web-app.yml/badge.svg)
 
 # Containerized App Exercise
 
@@ -25,10 +25,26 @@ This project provides a containerized system through these subsystems:
 Make sure both **[Docker](https://www.docker.com/products/docker-desktop)** and **[Docker Compose](https://docs.docker.com/compose/install/)** are installed.
 
 ### Config and Setup
-TBA
+1. Clone the repository:
+```bash
+git clone git@github.com:software-students-spring2025/4-containers-containerproject.git
+```
+2. Create a .env file (literally named: .env) in the root directory with the following contents:
+```bash
+MONGO_URI=mongodb://mongodb:27017/jumping-jack-db
+```
 
 ### Running the System
-TBA
+1. Ensure you are in the root directory, and run:
+```bash
+docker-compose up
+```
+
+2. Access the application through the URL http://localhost:5001/ on your local system.
 
 ### Stopping the System
-TBA
+1. Run:
+```bash
+docker-compose down
+```
+
