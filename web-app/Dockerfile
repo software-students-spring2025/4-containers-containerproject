@@ -17,7 +17,7 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    FLASK_APP=app.py \
+    FLASK_APP=run.py \
     FLASK_RUN_PORT=5001 \
     FLASK_RUN_HOST=0.0.0.0
 
