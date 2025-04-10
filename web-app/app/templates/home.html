@@ -1,34 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+    rel="stylesheet">
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jumparoo | Home</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 </head>
+
 <body>
   <div class="session-container">
 
     <!-- left stats -->
     <div class="left-panel">
       {% if session_active %}
-        <div class="stat">
-          <p class="label">Current Jump Count</p>
-          <p class="value">10</p>
-        </div>
+      <div class="stat">
+        <p class="label">Current Jump Count</p>
+        <p class="value">10</p>
+      </div>
       {% else %}
-        <div class="stat">
-          <p class="label">Total Jump Count</p>
-          <p class="value">{{ user.jump_count if user else 0 }}</p>
-        </div>
-        <div class="stat">
-          <p class="label">Total Jump Time (sec)</p>
-          <p class="value">{{ user.seconds_jumped if user else 0 }}</p>
-        </div>
-        <div class="stat">
-          <p class="label">Total Calories Burned</p>
-          <p class="value">{{ user.calories_burned | round(2) }}</p>
-        </div>
+      <div class="stat">
+        <p class="label">Total Jump Count</p>
+        <p class="value">{{ user.jump_count if user else 0 }}</p>
+      </div>
+      <div class="stat">
+        <p class="label">Total Jump Time (sec)</p>
+        <p class="value">{{ user.seconds_jumped if user else 0 }}</p>
+      </div>
+      <div class="stat">
+        <p class="label">Total Calories Burned</p>
+        <p class="value">{{ user.calories_burned | round(2) }}</p>
+      </div>
       {% endif %}
     </div>
 
@@ -40,9 +47,9 @@
       <form method="POST" class="controls">
         <button type="submit">
           {% if session_active %}
-            End Session
+          End Session
           {% else %}
-            Start Session
+          Start Session
           {% endif %}
         </button>
       </form>
@@ -51,25 +58,26 @@
     <!-- right stats -->
     <div class="right-panel">
       {% if not session_active %}
-        <form action="{{ url_for('logout') }}" method="get" class="logout-form">
-          <button type="submit" class="logout-btn">Log Out</button>
-        </form>
-        <h3>Leaderboard</h3>
-        <table class="leaderboard">
-          <tr>
-            <th>Username</th>
-            <th>Total Jumps</th>
-          </tr>
-          {% for entry in leaderboard %}
-          <tr>
-            <td>{{ entry.username }}</td>
-            <td>{{ entry.jump_count }}</td>
-          </tr>
-          {% endfor %}
-        </table>
+      <form action="{{ url_for('logout') }}" method="get" class="logout-form">
+        <button type="submit" class="logout-btn">Log Out</button>
+      </form>
+      <h3>Leaderboard</h3>
+      <table class="leaderboard">
+        <tr>
+          <th>Username</th>
+          <th>Total Jumps</th>
+        </tr>
+        {% for entry in leaderboard %}
+        <tr>
+          <td>{{ entry.username }}</td>
+          <td>{{ entry.jump_count }}</td>
+        </tr>
+        {% endfor %}
+      </table>
       {% endif %}
     </div>
 
   </div>
 </body>
+
 </html>
