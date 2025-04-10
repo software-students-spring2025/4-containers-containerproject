@@ -6,4 +6,5 @@
 disable=
     E0611,  # No name X in module Y
     E1101,  # Module X has no Y member
-    R0903   # Too few public methods 
+    R0903   # Too few public methods
+    E0401   # Mediapipe import error
