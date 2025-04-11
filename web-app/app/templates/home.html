@@ -13,39 +13,47 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 </head>
 
-<body>
+<body data-session-active="{% if session_active %}true{% else %}false{% endif %}" 
+      {% if user %}
+      data-user-weight="{{ user.weight }}"
+      data-user-jump-count="{{ user.jump_count }}"
+      data-user-calories-burned="{{ user.calories_burned }}"
+      data-user-seconds-jumped="{{ user.seconds_jumped }}"
+      {% endif %}>
   <div class="session-container">
 
     <!-- left stats -->
     <div class="left-panel">
-      {% if session_active %}
       <div class="stat">
-        <p class="label">Current Jump Count</p>
-        <p class="value">10</p>
-      </div>
-      {% else %}
-      <div class="stat">
-        <p class="label">Total Jump Count</p>
-        <p class="value">{{ user.jump_count if user else 0 }}</p>
+        <p class="label">{% if session_active %}Current{% else %}Total{% endif %} Jump Count</p>
+        <p id="current-jump-count" class="value">{% if not session_active and user %}{{ user.jump_count }}{% else %}0{% endif %}</p>
       </div>
       <div class="stat">
-        <p class="label">Total Jump Time (sec)</p>
-        <p class="value">{{ user.seconds_jumped if user else 0 }}</p>
+        <p class="label">{% if session_active %}Current{% else %}Total{% endif %} Jump Time (sec)</p>
+        <p id="jump-time" class="value">{% if not session_active and user %}{{ user.seconds_jumped }}{% else %}0{% endif %}</p>
       </div>
       <div class="stat">
-        <p class="label">Total Calories Burned</p>
-        <p class="value">{{ user.calories_burned | round(2) }}</p>
+        <p class="label">{% if session_active %}Current{% else %}Total{% endif %} Calories Burned</p>
+        <p id="calories-burned" class="value">{% if not session_active and user %}{{ user.calories_burned|round|int }}{% else %}0{% endif %}</p>
       </div>
-      {% endif %}
+      <div id="position-display" class="stat">Position: DOWN</div>
     </div>
 
     <!-- webcam input -->
     <div class="webcam-wrapper">
-      <div class="webcam-placeholder">
-        webcam input
+      <div class="webcam-container">
+        <video id="video" autoplay playsinline style="display: none;"></video>
+        <img id="processed-video" src="">
+        <div id="connection-info">WebSocket: Disconnected</div>
+        <div id="fps-display">FPS: 0</div>
+        <div id="status"></div>
       </div>
-      <form method="POST" class="controls">
-        <button type="submit">
+      
+      <form id="session-form" method="POST" action="{{ url_for('home') }}" class="controls">
+        <input type="hidden" id="jump_count" name="jump_count" value="0">
+        <input type="hidden" id="seconds_jumped" name="seconds_jumped" value="0">
+        <input type="hidden" id="calories_burned" name="calories_burned" value="0">
+        <button type="submit" id="session-btn">
           {% if session_active %}
           End Session
           {% else %}
@@ -57,7 +65,6 @@
 
     <!-- right stats -->
     <div class="right-panel">
-      {% if not session_active %}
       <form action="{{ url_for('logout') }}" method="get" class="logout-form">
         <button type="submit" class="logout-btn">Log Out</button>
       </form>
@@ -74,10 +81,274 @@
         </tr>
         {% endfor %}
       </table>
-      {% endif %}
     </div>
 
   </div>
+  
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <script>
+    // DOM elements
+    const video = document.getElementById('video');
+    const processedVideo = document.getElementById('processed-video');
+    const canvas = document.getElementById('canvas');
+    const statusDiv = document.getElementById('status');
+    const connectionInfo = document.getElementById('connection-info');
+    const fpsDisplay = document.getElementById('fps-display');
+    const currentJumpCount = document.getElementById('current-jump-count');
+    const positionDisplay = document.getElementById('position-display');
+    const jumpTime = document.getElementById('jump-time');
+    const caloriesBurned = document.getElementById('calories-burned');
+    const sessionForm = document.getElementById('session-form');
+    const jumpCountInput = document.getElementById('jump_count');
+    const secondsJumpedInput = document.getElementById('seconds_jumped');
+    const caloriesBurnedInput = document.getElementById('calories_burned');
+    const logoutForm = document.querySelector('.logout-form');
+    
+    let stream = null;
+    let streaming = false;
+    let socket = null;
+    let frameInterval = null;
+    let sessionStartTime = null;
+    let elapsedSeconds = 0;
+    let timerInterval = null;
+    let currentCount = 0;
+    let isTrackingStats = false;
+    let userWeight = parseFloat(document.body.getAttribute('data-user-weight') || 70);
+    let userJumpCount = parseInt(document.body.getAttribute('data-user-jump-count') || 0);
+    let userCaloriesBurned = parseFloat(document.body.getAttribute('data-user-calories-burned') || 0);
+    let userSecondsJumped = parseInt(document.body.getAttribute('data-user-seconds-jumped') || 0);
+    
+    let frameCount = 0;
+    let lastTime = Date.now();
+    const frameRate = 15;
+    const frameDelay = 1000 / frameRate;
+    
+    // Function to toggle session UI elements
+    function toggleSessionUI(isActive) {
+      // Hide the logout button when session is active
+      logoutForm.classList.toggle('hidden', isActive);
+      
+      // Update the session tracking state
+      isTrackingStats = isActive;
+      
+      if (isActive) {
+        // Reset counters and start new session
+        currentCount = 0;
+        elapsedSeconds = 0;
+        currentJumpCount.textContent = '0';
+        jumpTime.textContent = '0';
+        caloriesBurned.textContent = '0';
+        jumpCountInput.value = '0';
+        secondsJumpedInput.value = '0';
+        caloriesBurnedInput.value = '0';
+        
+        // Start the timer
+        sessionStartTime = Date.now();
+        timerInterval = setInterval(() => {
+          const currentTime = Date.now();
+          elapsedSeconds = Math.floor((currentTime - sessionStartTime) / 1000);
+          jumpTime.textContent = elapsedSeconds;
+          secondsJumpedInput.value = elapsedSeconds;
+          
+          // Calculate calories burned using the same formula as in routes.py
+          const calories = ((elapsedSeconds * 12 * userWeight) / (60 * 150)).toFixed(1);
+          caloriesBurned.textContent = calories;
+          caloriesBurnedInput.value = calories;
+        }, 1000);
+      } else {
+        // End session and restore total statistics
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        currentJumpCount.textContent = userJumpCount;
+        jumpTime.textContent = userSecondsJumped;
+        caloriesBurned.textContent = Math.round(userCaloriesBurned);
+      }
+    }
+    
+    // Connect to WebSocket server for ML processing
+    function connectWebSocket() {
+      const host = window.location.hostname;
+      const port = 8765;
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${wsProtocol}//${host}:${port}`;
+      
+      socket = new WebSocket(wsUrl);
+      
+      socket.onopen = function() {
+        connectionInfo.textContent = 'WebSocket: Connected';
+        connectionInfo.style.color = 'green';
+        startStreaming();
+        statusDiv.textContent = 'Connected to ML service';
+        statusDiv.className = 'success';
+      };
+      
+      socket.onclose = function() {
+        connectionInfo.textContent = 'WebSocket: Disconnected';
+        connectionInfo.style.color = 'red';
+        stopStreaming();
+        statusDiv.textContent = 'Disconnected from ML service';
+        statusDiv.className = 'error';
+      };
+      
+      socket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+        statusDiv.textContent = 'WebSocket error.';
+        statusDiv.className = 'error';
+      };
+      
+      socket.onmessage = function(event) {
+        try {
+          const response = JSON.parse(event.data);
+          
+          if (response.type === 'ml_result') {
+            if (response.image) {
+              processedVideo.src = response.image;
+            }
+
+            if (response.data) {
+              positionDisplay.textContent = `Position: ${response.data.state.toUpperCase()}`;
+              
+              if (response.data.jump_detected && isTrackingStats) {
+                currentCount++;
+                currentJumpCount.textContent = currentCount;
+                jumpCountInput.value = currentCount;
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing message:', e);
+        }
+      };
+    }
+    
+    // Start the webcam and ML client immediately
+    async function startWebcamAndML() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            frameRate: { ideal: 30 }
+          },
+          audio: false
+        });
+        video.srcObject = stream;
+        
+        canvas.width = 640;
+        canvas.height = 480;
+
+        connectWebSocket();
+        
+        statusDiv.textContent = 'Camera started successfully';
+        statusDiv.className = 'success';
+      } catch (error) {
+        statusDiv.textContent = `Error accessing camera: ${error.message}`;
+        statusDiv.className = 'error';
+        console.error('Error accessing camera:', error);
+      }
+    }
+    
+    // Function to capture and send frames
+    function captureAndSendFrame() {
+      if (!streaming || !socket || socket.readyState !== WebSocket.OPEN) {
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const frameData = canvas.toDataURL('image/jpeg', 0.8);
+      
+      socket.send(JSON.stringify({
+        type: 'frame',
+        data: frameData,
+        timestamp: Date.now()
+      }));
+      
+      frameCount++;
+      const now = Date.now();
+      const elapsed = now - lastTime;
+      
+      if (elapsed >= 1000) {
+        const fps = Math.round((frameCount * 1000) / elapsed);
+        fpsDisplay.textContent = `FPS: ${fps}`;
+        frameCount = 0;
+        lastTime = now;
+      }
+    }
+    
+    function startStreaming() {
+      if (!stream || !socket || socket.readyState !== WebSocket.OPEN) {
+        statusDiv.textContent = 'Cannot start tracking: no camera or connection';
+        statusDiv.className = 'error';
+        return;
+      }
+      
+      streaming = true;
+      frameInterval = setInterval(captureAndSendFrame, frameDelay);
+      
+      statusDiv.textContent = 'Jumping jack tracking started';
+      statusDiv.className = 'success';
+    }
+    
+    function stopStreaming() {
+      streaming = false;
+      if (frameInterval) {
+        clearInterval(frameInterval);
+        frameInterval = null;
+      }
+      
+      statusDiv.textContent = 'Tracking stopped';
+      statusDiv.className = 'success';
+    }
+    
+    // Handle page unload to clean up resources
+    function cleanupResources() {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+      
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      
+      if (frameInterval) {
+        clearInterval(frameInterval);
+      }
+      
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+    }
+    
+    window.addEventListener('beforeunload', cleanupResources);
+
+    document.addEventListener('DOMContentLoaded', function() {
+      startWebcamAndML();
+      
+      const isSessionActive = document.body.getAttribute('data-session-active') === 'true';
+      if (isSessionActive) {
+        toggleSessionUI(true);
+      }
+      
+      sessionForm.addEventListener('submit', function(event) {
+        const isActive = document.body.getAttribute('data-session-active') === 'true';
+        
+        if (isActive) {
+          jumpCountInput.value = currentCount;
+          secondsJumpedInput.value = elapsedSeconds;
+          caloriesBurnedInput.value = caloriesBurned.textContent;
+        } else {
+          jumpCountInput.value = '0';
+          secondsJumpedInput.value = '0';
+          caloriesBurnedInput.value = '0';
+          currentJumpCount.textContent = '0';
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

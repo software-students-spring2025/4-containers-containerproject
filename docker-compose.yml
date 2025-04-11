@@ -8,16 +8,26 @@ services:
       - mongodb_data:/data/db
       - ./jumping-jack-db:/data/restore
       - ./scripts/init-restore.sh:/docker-entrypoint-initdb.d/init-restore.sh
+    networks:
+      - app-network
 
   machine-learning-client:
-    build: ./machine-learning-client
+    build: 
+      context: ./machine-learning-client
+      dockerfile: Dockerfile
     container_name: ml-client
+    ports:
+      - "8765:8765"  # Expose WebSocket port
     env_file:
       - .env
     volumes:
-      - ./machine-learning-client:/app
+      - ./machine-learning-client/main.py:/app/main.py
     depends_on:
       - mongodb
+    networks:
+      - app-network
+    restart: always
+    hostname: ml-service
 
   web-app:
     build: ./web-app
@@ -33,6 +43,14 @@ services:
       - ./web-app:/app
     depends_on:
       - mongodb
+      - machine-learning-client
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mongodb_data:
