@@ -105,15 +105,25 @@ def home():
             end_time = time.time()
             session_length = int(end_time - session.get("start_time", end_time))
 
+            # Get jump count from form
+            jump_count = int(request.form.get("jump_count", 0))
+            seconds_jumped = int(request.form.get("seconds_jumped", session_length))
+            calories_from_form = float(request.form.get("calories_burned", 0))
+
             if user:
                 weight = float(user.get("weight", 0))
-                added_calories = (session_length * 12 * weight) / (60 * 150)
+                # Defensive programming -> calculate calories if js doesn't work
+                if calories_from_form > 0:
+                    added_calories = calories_from_form
+                else:
+                    added_calories = (session_length * 12 * weight) / (60 * 150)
 
                 mongo.db.users.update_one(
                     {"_id": ObjectId(session["user_id"])},
                     {
                         "$inc": {
-                            "seconds_jumped": session_length,
+                            "jump_count": jump_count,
+                            "seconds_jumped": seconds_jumped,
                             "calories_burned": round(added_calories, 2),
                         }
                     },
