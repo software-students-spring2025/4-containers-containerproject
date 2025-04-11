@@ -13,22 +13,28 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 </head>
 
-<body data-session-active="{% if session_active %}true{% else %}false{% endif %}" {% if user %}data-user-weight="{{ user.weight }}"{% endif %}>
+<body data-session-active="{% if session_active %}true{% else %}false{% endif %}" 
+      {% if user %}
+      data-user-weight="{{ user.weight }}"
+      data-user-jump-count="{{ user.jump_count }}"
+      data-user-calories-burned="{{ user.calories_burned }}"
+      data-user-seconds-jumped="{{ user.seconds_jumped }}"
+      {% endif %}>
   <div class="session-container">
 
     <!-- left stats -->
     <div class="left-panel">
       <div class="stat">
-        <p class="label">Current Jump Count</p>
-        <p id="current-jump-count" class="value">0</p>
+        <p class="label">{% if session_active %}Current{% else %}Total{% endif %} Jump Count</p>
+        <p id="current-jump-count" class="value">{% if not session_active and user %}{{ user.jump_count }}{% else %}0{% endif %}</p>
       </div>
-      <div class="stat {% if not session_active %}hidden{% endif %}">
-        <p class="label">Jump Time (sec)</p>
-        <p id="jump-time" class="value">0</p>
+      <div class="stat">
+        <p class="label">{% if session_active %}Current{% else %}Total{% endif %} Jump Time (sec)</p>
+        <p id="jump-time" class="value">{% if not session_active and user %}{{ user.seconds_jumped }}{% else %}0{% endif %}</p>
       </div>
-      <div class="stat {% if not session_active %}hidden{% endif %}">
-        <p class="label">Calories Burned</p>
-        <p id="calories-burned" class="value">0</p>
+      <div class="stat">
+        <p class="label">{% if session_active %}Current{% else %}Total{% endif %} Calories Burned</p>
+        <p id="calories-burned" class="value">{% if not session_active and user %}{{ user.calories_burned|round|int }}{% else %}0{% endif %}</p>
       </div>
       <div id="position-display" class="stat">Position: DOWN</div>
     </div>
@@ -108,6 +114,9 @@
     let currentCount = 0;
     let isTrackingStats = false;
     let userWeight = parseFloat(document.body.getAttribute('data-user-weight') || 70);
+    let userJumpCount = parseInt(document.body.getAttribute('data-user-jump-count') || 0);
+    let userCaloriesBurned = parseFloat(document.body.getAttribute('data-user-calories-burned') || 0);
+    let userSecondsJumped = parseInt(document.body.getAttribute('data-user-seconds-jumped') || 0);
     
     let frameCount = 0;
     let lastTime = Date.now();
@@ -134,6 +143,10 @@
         startTimer();
       } else {
         stopTimer();
+        // Restore total statistics when session ends
+        currentJumpCount.textContent = userJumpCount;
+        jumpTime.textContent = userSecondsJumped;
+        caloriesBurned.textContent = Math.round(userCaloriesBurned);
       }
     }
     
