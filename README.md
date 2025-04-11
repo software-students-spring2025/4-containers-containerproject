@@ -48,3 +48,6 @@ docker-compose up
 docker-compose down
 ```
 
+### Note on ML Client Linting
+Pylint has historically experienced issues linting OpenCV(cv2)'s package as described in [this](https://github.com/pylint-dev/pylint/issues/2426) issue. It is labelled as fixed but users have had issues years after the issue closed. We tried all fixes as described in this thread but none worked, so we decided on ignoring these linter errors.
+
