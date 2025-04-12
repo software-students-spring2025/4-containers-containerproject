@@ -30,4 +30,4 @@ jobs:
         run: docker build -t ml-client .
       
       - name: Run unit tests in Docker container
-        run: docker run --rm ml-client pipenv run pytest
+        run: docker run --rm ml-client pytest
