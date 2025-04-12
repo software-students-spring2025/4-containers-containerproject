@@ -1,4 +1,4 @@
-name: Web App CI
+name: Web App Build and Test
 
 on:
   push:
@@ -9,32 +9,25 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: web-app
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install pipenv
+          pipenv sync --dev
 
-      - name: Lint with pylint
-        run: |
-          pip install pylint
-          pylint app/ --exit-zero
+      - name: Build Docker image
+        run: docker build -t web-app .
 
-      - name: Test Flask app import
-        env:
-          MONGO_URI: mongodb://mongodb:27017/jumping-jack-db
-        run: |
-          python -c "from app import app"
+      - name: Run unit tests in Docker container
+        run: docker run --rm web-app pytest
