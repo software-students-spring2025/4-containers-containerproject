@@ -27,7 +27,6 @@ jobs:
       - name: Install machine learning dependencies and test
         working-directory: machine-learning-client
         run: |
-          pip install -r requirements.txt
           pip install pytest
           pytest tests/ -v
 
