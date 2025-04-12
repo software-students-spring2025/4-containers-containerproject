@@ -1,6 +1,6 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
-![Python Workflow - Machine Learing Client](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/ml-client.yml/badge.svg)
-![Python Workflow - Web App](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/web-app.yml/badge.svg)
+![ML Client CI](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/ml-client.yml/badge.svg)
+![Web App CI](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/webapp.yml/badge.svg)
 
 # Containerized App Exercise
 
