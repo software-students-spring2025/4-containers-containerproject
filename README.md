@@ -1,12 +1,12 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
-![ML Client CI](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/ml-client.yml/badge.svg)
-![Web App CI](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/webapp.yml/badge.svg)
+![ML Client Build/Test](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/ml-client.yml/badge.svg)
+![Web App Build/Test](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/webapp.yml/badge.svg)
 
-# Containerized App Exercise
+# Jumparoo
 
 ## **Overview**
 
-This application will utilize machine learning to assist with exercise, namely counting jumping jacks as well as tracking calories burned per session and over the usage lifetime. 
+Jumparoo is a web application that utilizes machine learning to assist with your exercise goals! Namely, Jumparoo uses your webcam to count the number of jumping jacks you do, as well as the time spent jumping. Jumparoo also tracks your calories burned per jumping session, the total number of calories you've burned using Jumparoo, and, to make jumping fun, Jumparoo also displays a leaderboard of the top jumpers so you can compete with friends and strangers alike!
 
 This project provides a containerized system through these subsystems:
 1. **ML Backend:** Uses camera data to perform ML-based jumping jack tracking
@@ -40,7 +40,8 @@ MONGO_URI=mongodb://mongodb:27017/jumping-jack-db
 docker-compose up
 ```
 
-2. Access the application through the URL http://localhost:5001/ on your local system.
+2. Once the containers are up and running, open your browser and navigate to [http://localhost:5001](http://localhost:5001).
+
 
 ### Stopping the System
 1. Run:
