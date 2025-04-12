@@ -1,6 +1,5 @@
-![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
-![ML Client Build/Test](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/ml-client.yml/badge.svg)
-![Web App Build/Test](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/webapp.yml/badge.svg)
+![ML Client Build and Test](https://github.com/software-students-spring2025/4-containers-containerproject/actions/workflows/ml-client.yml/badge.svg)
+![Web App Build and Test](https://github.com/software-students-spring2025/4-containers-containerproject/actions/workflows/webapp.yml/badge.svg)
 
 # Jumparoo
 
