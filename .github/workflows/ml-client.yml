@@ -24,4 +24,4 @@ jobs:
           python -m pip install --upgrade pip
 
       - name: Docker build
-        run: docker build -t ml-client .
+        run: docker build -t ml-client machine-learning-client
