@@ -1,0 +1,1 @@
+This bash script is used to pre-populate your local MongoDB database with sample user data when the app starts for the first time.
