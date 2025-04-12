@@ -34,5 +34,7 @@ jobs:
           pylint app/ --exit-zero
 
       - name: Test Flask app import
+        env:
+          MONGO_URI: mongodb://mongodb:27017/jumping-jack-db
         run: |
           python -c "from app import app"
