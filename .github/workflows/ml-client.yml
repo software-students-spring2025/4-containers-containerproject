@@ -1,4 +1,4 @@
-name: ml client build and test
+name: ML Client Build and Test
 
 on:
   push:
