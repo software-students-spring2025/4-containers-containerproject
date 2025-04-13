@@ -3,13 +3,23 @@ webpage routes
 """
 
 import time
-from flask import render_template, request, session, redirect, url_for, flash
+from flask import (
+    render_template,
+    request,
+    session,
+    redirect,
+    url_for,
+    flash,
+    current_app,
+)
 from bson.objectid import ObjectId
-from app import mongo
-from . import app  # pylint: disable=cyclic-import
 
 
-@app.route("/")
+def get_mongo():
+    """Helper function to get the current MongoDB instance"""
+    return current_app.mongo
+
+
 def index():
     """
     temp route
@@ -17,7 +27,6 @@ def index():
     return redirect(url_for("login"))
 
 
-@app.route("/login", methods=["GET", "POST"])
 def login():
     """
     login
@@ -27,7 +36,7 @@ def login():
         password = request.form["password"]  # get password from form
 
         # look for the user in the MongoDB 'users' collection
-        user = mongo.db.users.find_one({"username": username})
+        user = get_mongo().db.users.find_one({"username": username})
 
         if user and user["password"] == password:
             session["user_id"] = str(user["_id"])  # user session
@@ -37,7 +46,6 @@ def login():
     return render_template("login.html")  # render login page
 
 
-@app.route("/register", methods=["GET", "POST"])
 def register():
     """
     register
@@ -48,13 +56,13 @@ def register():
         weight = float(request.form["weight"])
 
         # check if the username is already in use
-        existing_user = mongo.db.users.find_one({"username": username})
+        existing_user = get_mongo().db.users.find_one({"username": username})
         if existing_user:
             flash("Username is already in use. Please choose another username.")
             return render_template("register.html")
 
         # if the user does not exist, add the new user
-        mongo.db.users.insert_one(
+        get_mongo().db.users.insert_one(
             {
                 "username": username,
                 "password": password,
@@ -70,7 +78,6 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/logout")
 def logout():
     """
     session logout
@@ -80,17 +87,20 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route("/home", methods=["GET", "POST"])
 def home():
     """
     central page
     """
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
     if "session_active" not in session:
         session["session_active"] = False
 
     user = None
     if "user_id" in session:
-        user = mongo.db.users.find_one({"_id": ObjectId(session["user_id"])})
+        user = get_mongo().db.users.find_one({"_id": ObjectId(session["user_id"])})
 
     calories_burned = 0
 
@@ -118,7 +128,7 @@ def home():
                 else:
                     added_calories = (session_length * 12 * weight) / (60 * 150)
 
-                mongo.db.users.update_one(
+                get_mongo().db.users.update_one(
                     {"_id": ObjectId(session["user_id"])},
                     {
                         "$inc": {
@@ -129,13 +139,16 @@ def home():
                     },
                 )
 
-                user = mongo.db.users.find_one({"_id": ObjectId(session["user_id"])})
+                user = get_mongo().db.users.find_one(
+                    {"_id": ObjectId(session["user_id"])}
+                )
                 calories_burned = round(added_calories, 2)
 
             session.pop("start_time", None)
 
     leaderboard = list(
-        mongo.db.users.find({}, {"username": 1, "jump_count": 1, "_id": 0})
+        get_mongo()
+        .db.users.find({}, {"username": 1, "jump_count": 1, "_id": 0})
         .sort("jump_count", -1)
         .limit(5)
     )
