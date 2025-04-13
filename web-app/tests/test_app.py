@@ -1,10 +1,12 @@
 """
 Flask application instance for testing.
 """
+
 import os
 from flask import Flask
 from flask_pymongo import PyMongo
 from app.routes import index, login, register, logout, home
+
 
 def create_test_app():
     """
