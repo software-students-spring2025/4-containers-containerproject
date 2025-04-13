@@ -19,8 +19,8 @@ app.config["SECRET_KEY"] = os.urandom(24)
 mongo = PyMongo(app)
 
 # Register routes
-app.route('/')(index)
-app.route('/login', methods=['GET', 'POST'])(login)
-app.route('/register', methods=['GET', 'POST'])(register)
-app.route('/logout')(logout)
-app.route('/home', methods=['GET', 'POST'])(home)
+app.route("/")(index)
+app.route("/login", methods=["GET", "POST"])(login)
+app.route("/register", methods=["GET", "POST"])(register)
+app.route("/logout")(logout)
+app.route("/home", methods=["GET", "POST"])(home)

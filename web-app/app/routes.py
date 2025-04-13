@@ -3,18 +3,29 @@ webpage routes
 """
 
 import time
-from flask import render_template, request, session, redirect, url_for, flash, current_app
+from flask import (
+    render_template,
+    request,
+    session,
+    redirect,
+    url_for,
+    flash,
+    current_app,
+)
 from bson.objectid import ObjectId
+
 
 def get_mongo():
     """Helper function to get the current MongoDB instance"""
     return current_app.mongo
+
 
 def index():
     """
     temp route
     """
     return redirect(url_for("login"))
+
 
 def login():
     """
@@ -33,6 +44,7 @@ def login():
         flash("Invalid username or password. Please try again.")
 
     return render_template("login.html")  # render login page
+
 
 def register():
     """
@@ -65,6 +77,7 @@ def register():
 
     return render_template("register.html")
 
+
 def logout():
     """
     session logout
@@ -73,13 +86,14 @@ def logout():
     flash("Thanks for jumping with Jumparoo!")
     return redirect(url_for("login"))
 
+
 def home():
     """
     central page
     """
 
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
+    if "user_id" not in session:
+        return redirect(url_for("login"))
 
     if "session_active" not in session:
         session["session_active"] = False
@@ -125,13 +139,16 @@ def home():
                     },
                 )
 
-                user = get_mongo().db.users.find_one({"_id": ObjectId(session["user_id"])})
+                user = get_mongo().db.users.find_one(
+                    {"_id": ObjectId(session["user_id"])}
+                )
                 calories_burned = round(added_calories, 2)
 
             session.pop("start_time", None)
 
     leaderboard = list(
-        get_mongo().db.users.find({}, {"username": 1, "jump_count": 1, "_id": 0})
+        get_mongo()
+        .db.users.find({}, {"username": 1, "jump_count": 1, "_id": 0})
         .sort("jump_count", -1)
         .limit(5)
     )
