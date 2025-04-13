@@ -32,7 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pipenv
           pipenv sync --dev
-          pipenv install pytest
+          pipenv install pytest pytest-cov
 
       - name: Build Docker image
         run: docker build -t web-app .
@@ -41,4 +41,4 @@ jobs:
         env:
           MONGO_URI: mongodb://localhost:27017/test_db
         run: |
-          pytest tests/ --cov=app --cov-report=xml
+          pipenv run pytest tests/ --cov=app --cov-report=xml
