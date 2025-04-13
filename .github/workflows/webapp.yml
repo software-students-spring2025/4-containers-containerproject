@@ -44,5 +44,7 @@ jobs:
           docker run --rm \
             -e MONGO_URI=$MONGO_URI \
             -e PYTHONPATH=/app \
+            -e PYTHONUNBUFFERED=1 \
+            --network=host \
             --add-host=host.docker.internal:host-gateway \
-            web-app pytest tests/
+            web-app pytest -v tests/
