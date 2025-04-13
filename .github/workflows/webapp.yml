@@ -45,4 +45,3 @@ jobs:
             -e MONGO_URI=$MONGO_URI \
             -e PYTHONPATH=/app \
             --add-host=host.docker.internal:host-gateway \
-            web-app pytest tests/ --cov=app --cov-report=xml
