@@ -1,5 +1,6 @@
 """
 Unit Tests for ML Client
+Coverage: 88% according to coverage.py
 """
 
 import json
