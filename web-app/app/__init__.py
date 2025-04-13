@@ -12,11 +12,11 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config["MONGO_URI"] = os.getenv("MONGO_URI")
-
+app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/jumparoo")
 app.config["SECRET_KEY"] = os.urandom(24)
 
-mongo = PyMongo(app)
+# Initialize MongoDB
+app.mongo = PyMongo(app)
 
 # Register routes
 app.route("/")(index)

@@ -47,3 +47,4 @@ def auth_client(test_client, test_app):  # pylint: disable=redefined-outer-name
 
     # Login the test user
     test_client.post("/login", data={"username": "testuser", "password": "testpass"})
+    return test_client
