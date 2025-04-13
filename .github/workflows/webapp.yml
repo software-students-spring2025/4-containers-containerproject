@@ -37,8 +37,8 @@ jobs:
       - name: Build Docker image
         run: docker build -t web-app .
 
-      - name: Run unit tests
+      - name: Run unit tests in Docker container
         env:
           MONGO_URI: mongodb://localhost:27017/test_db
         run: |
-          pipenv run pytest tests/ --cov=app --cov-report=xml
+          docker run --rm -e PYTHONPATH=/app web-app pytest
