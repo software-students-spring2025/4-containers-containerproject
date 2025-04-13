@@ -17,4 +17,11 @@ app.config["SECRET_KEY"] = os.urandom(24)
 
 mongo = PyMongo(app)
 
-from app import routes  # pylint: disable=wrong-import-position
+from app.routes import index, login, register, logout, home
+
+# Register routes
+app.route('/')(index)
+app.route('/login', methods=['GET', 'POST'])(login)
+app.route('/register', methods=['GET', 'POST'])(register)
+app.route('/logout')(logout)
+app.route('/home', methods=['GET', 'POST'])(home)
