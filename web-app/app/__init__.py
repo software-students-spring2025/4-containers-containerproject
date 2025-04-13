@@ -6,6 +6,7 @@ import os
 from flask import Flask
 from flask_pymongo import PyMongo
 from dotenv import load_dotenv
+from app.routes import index, login, register, logout, home
 
 load_dotenv()
 
@@ -16,8 +17,6 @@ app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["SECRET_KEY"] = os.urandom(24)
 
 mongo = PyMongo(app)
-
-from app.routes import index, login, register, logout, home
 
 # Register routes
 app.route('/')(index)

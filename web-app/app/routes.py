@@ -3,14 +3,12 @@ webpage routes
 """
 
 import time
-from flask import render_template, request, session, redirect, url_for, flash
+from flask import render_template, request, session, redirect, url_for, flash, current_app
 from bson.objectid import ObjectId
-from app import mongo
 
 def get_mongo():
     """Helper function to get the current MongoDB instance"""
-    from flask import current_app
-    return current_app.mongo if hasattr(current_app, 'mongo') else mongo
+    return current_app.mongo
 
 def index():
     """
